@@ -1,8 +1,10 @@
 package samples
 
-import org.junit._
-import Assert._
+import org.junit.*
+import Assert.*
 import uk.roland.abstractions.*
+
+import scala.collection.mutable.ArrayBuffer
 @Test
 class AppTest {
 
@@ -16,13 +18,14 @@ class AppTest {
     assertEquals(4, Parser.add(2, 2))
 }
     val parser = ParseDSL()
+    val input: String = """'requests' => ::read{}, ::write{}, ::create{}."""
 
     @Test
     def testgetDSLRulestoObject(): Unit ={
         val readRole: Role = Role("read","", parser)
         val writeRole: Role = Role("write","", parser)
         val createRole: Role = Role("create","", parser)
-        var Roles: List[Role] = List(readRole, writeRole, createRole)
+        var Roles: ArrayBuffer[Role] = ArrayBuffer(readRole, writeRole, createRole)
         var ObjectRules : DSLRole = DSLRole("requests", Roles)
         assertEquals(ObjectRules, parser.getDSLRulesfromString(input))
     }

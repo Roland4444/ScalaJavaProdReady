@@ -2,17 +2,42 @@ package uk.roland.abstractions
 
 import uk.roland.util.Checker
 
+import scala.collection.mutable.ArrayBuffer
+import scala.util.control.Breaks.{break, breakable}
+
 
 class ParseDSL  {
 
     val checker: Checker = Checker()
-    extension (c: String)
-    def circumference: Double = c.radius * math.Pi * 2
+    extension (c: String){
+        def prepare: String = {
+            var buffer = StringBuilder()
+            var appendWhite = false
+            var currentString: String = c
+            if (currentString.indexOf("'")<0)
+                return currentString.replace(" ","")
+            for ( i <- 0 to c.length-1){
+                breakable{
+                    if ((c.charAt(i)==" ".charAt(0)) && !appendWhite)
+                    break
+                    if ((c.charAt(i)=="'".charAt(0)) && !appendWhite)
+                        appendWhite = true
+                    else if ((c.charAt(i)=="'".charAt(0)) && appendWhite)
+                        appendWhite = false
+                    buffer.append(c.charAt(i))
+                }
+
+            }
+            buffer.toString()
+        }
+    }
+
+
 
     def add(A: Int, B: Int): Int= A+ B
     def getDSLRulesfromString(input: String): DSLRole = {
         val objectName: String = input.substring(input.indexOf("'")+1, input.lastIndexOf("'"))
-        println("""Loading rules for object <$objectName>""")
+        println(s"""Loading rules for object <$objectName>""")
         return DSLRole(objectName, parseRoles(input))
     }
 
@@ -28,16 +53,16 @@ class ParseDSL  {
             return null;
         return Role(rolename, params, this)
     }
-    def parseRoles(input: String): List[Role]={
-        var input__ = input.prepare()
-        var result: Seq[Role]  = Seq[Role]()
+    def parseRoles(input: String): ArrayBuffer[Role]={
+        var input__ = input.prepare
+        var result: ArrayBuffer[Role]  =  ArrayBuffer()
         var initialString = input
         var role: Role = parseRole(initialString)
         while (role != null){
-        result.add(role)
+        result.append(role)
         initialString = initialString.substring(initialString.indexOf("}")+1)
         role  = parseRole(initialString)
     };
-        return result
+        result
     }
 }
