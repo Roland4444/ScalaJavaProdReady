@@ -1,4 +1,4 @@
-package ch.roland
+package uk.roland.abstractions
 
 /**
  * @author ${user.name}
